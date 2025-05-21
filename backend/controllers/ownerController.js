@@ -205,8 +205,14 @@ const processXlsxToJson = (subject, owner, prefix) => {
       jsonData[i].subject = jsonData[i].subject + " Revert";
     }
   }
-  separateQueries(jsonData, command, subject, owner); //passing in subject = subjectSplit, owner = ownerSplit
-  passAllEntries(jsonData);
+  if (jsonData.length > 0){
+    separateQueries(jsonData, command, subject, owner); //passing in subject = subjectSplit, owner = ownerSplit
+    passAllEntries(jsonData);
+  }
+  else{
+    console.log("No data found");
+    process.kill(process.pid, 'SIGUSR2');
+  }
 };
 
 const separateQueries = (jsonData, command, subject, owner) => {
