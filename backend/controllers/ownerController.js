@@ -195,6 +195,16 @@ const processXlsxToJson = (subject, owner, prefix) => {
 
   // Convert the worksheet to JSON data
   const jsonData = xlsx.utils.sheet_to_json(worksheet);
+  for (let i = 0; i < jsonData.length; i++) {
+    if (jsonData[i].reason === "Revert") {
+    const testmatch = jsonData[i].subject.match(/\[.*\]/g);
+      console.log(testmatch);
+      jsonData[i].reason = testmatch[0];
+      jsonData[i].subject = jsonData[i].subject.replace('Revert "', '');
+      jsonData[i].subject = jsonData[i].subject.replace('"', '');
+      jsonData[i].subject = jsonData[i].subject + " Revert";
+    }
+  }
   separateQueries(jsonData, command, subject, owner); //passing in subject = subjectSplit, owner = ownerSplit
   passAllEntries(jsonData);
 };
