@@ -428,6 +428,8 @@ const SearchForm = ({
       gerrit,
       gerritArchive,
       gerritDelta,
+      gerritReview,
+      gerritSigma,
       intersect,
     } = values;
 
@@ -451,6 +453,8 @@ const SearchForm = ({
           gerrit: gerrit,
           gerritArchive: gerritArchive,
           gerritDelta: gerritDelta,
+          gerritReview: gerritReview,
+          gerritSigma: gerritSigma,
           intersect: intersect,
         }),
         //credentials: "include", This includes cookies if needed for session handling
