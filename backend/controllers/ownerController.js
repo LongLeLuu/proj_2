@@ -206,7 +206,19 @@ const processXlsxToJson = (subject, owner, prefix) => {
     }
   }
   if (jsonData.length > 0){
-    separateQueries(jsonData, command, subject, owner); //passing in subject = subjectSplit, owner = ownerSplit
+    modifiedOwner = owner;
+    jsonUser = [];
+    for (let i = 0; i < jsonData.length; i++) {
+      jsonUser.push(jsonData[i].user);
+    }
+    for (let i = 0; i < owner.length; i++) {
+      if (!jsonUser.includes(owner[i])) {
+        console.log(owner[i] + " not found, removing");
+        modifiedOwner = modifiedOwner.filter((item) => item !== owner[i]);
+      }
+    }
+
+    separateQueries(jsonData, command, subject, modifiedOwner); //passing in subject = subjectSplit, owner = ownerSplit
     passAllEntries(jsonData);
   }
   else{
@@ -233,10 +245,6 @@ it must be included in overlapArr as well
   //clear the arrays if the split element is empty quotes
   if (subjectSplit[0] === "") subjectSplit = [];
   if (ownerSplit[0] === "") ownerSplit = [];
-
-  console.log(subjectSplit.length);
-  console.log(ownerSplit.length);
-
   //if only the subject field was filled
   if (ownerSplit.length == 0) {
     let counter = 0;
