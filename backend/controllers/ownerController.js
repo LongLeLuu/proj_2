@@ -16,40 +16,6 @@ let prefix = "";
 function getCommits(req, res) {
   finalData = [];
 
-  /*
-  const { intersect } = req.body;
-
-  if (intersect) {
-    finalData = jsonWithIntersect;
-  } else {
-    finalData = json;
-  }
-
-  const connect = async () => {
-    try {
-      await sql.connect(config);
-      console.log("Connected to the database!");
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  connect();
-
-
-  setTimeout(() => {
-    //timeout to imitate script calltime
-    res.status(200).json({
-      status: "success",
-      message: "Data processed",
-      data: finalData,
-      subjectSplit: 2,
-      ownerSplit: 1,
-      intersect: intersect,
-    });
-  }, 3000);
-  */
-
   const {
     subject,
     owner,
@@ -121,10 +87,13 @@ function getCommits(req, res) {
 /*Fuctions Called (Stack Trace) in Top to Bottom Order */
 const buildCommand = (objData, command, prefix) => {
   const keys = Object.keys(objData);
+  console.log(keys);
   const values = Object.values(objData);
+  gerritString = "";
 
   for (let i = 0; i < keys.length; i++) {
     if (values[i] === "" || !values[i]) continue;
+    console.log(keys[i]);
     switch (keys[i]) {
       case "subject":
         command += `--reasons=${values[i]} `;
@@ -139,41 +108,39 @@ const buildCommand = (objData, command, prefix) => {
         command += `--end=${values[i]} `;
         break;
       case "gerrit":
-        command += `--gerrit=gerrit`;
+        gerritString += `--gerrit=gerrit`;
         break;
 
       case "gerritArchive":
-        if (!values[i - 1]) {
-          command += `--gerrit=gerrit-archive`;
-          break;
+        if (!gerritString) {
+          gerritString += `--gerrit=gerrit-archive`;
+        }else {
+          gerritString += `,gerrit-archive`;
         }
-        command += `,gerrit-archive`;
         break;
+
       case "gerritDelta":
-        if (!values[i - 2] && !values[i - 1]) {
-          command += `--gerrit=gerrit-delta`;
-          break;
+        if (!gerritString) {
+          gerritString += `--gerrit=gerrit-delta`;
+        } else {
+          gerritString += `,gerrit-delta`;
         }
-        command += `,gerrit-delta `;
         break;
+
       case "gerritReview":
-        if (!values[i - 3] && !values[i - 2] && !values[i - 1]) {
-          command += `--gerrit=gerrit-review`;
-          break;
+        if (!gerritString) {
+          gerritString += `--gerrit=gerrit-review`;
+        }else {
+          gerritString += `,gerrit-review`;
         }
-        command += `,gerrit-review `;
         break;
+
       case "gerritSigma":
-        if (
-          !values[i - 4] &&
-          !values[i - 3] &&
-          !values[i - 2] &&
-          !values[i - 1]
-        ) {
-          command += `--gerrit=gerrit-sigma`;
-          break;
+        if (!gerritString) {
+          gerritString += `--gerrit=gerrit-sigma`;
+        }else {
+          gerritString += `,gerrit-sigma`;
         }
-        command += `,gerrit-sigma `;
         break;
 
       case "intersect":
@@ -181,7 +148,8 @@ const buildCommand = (objData, command, prefix) => {
         break;
     }
   }
-  command += `--saveData `;
+  command += gerritString;
+  command += ` --saveData `;
   command += `--savePrefix=${prefix}`;
   return command;
 };
