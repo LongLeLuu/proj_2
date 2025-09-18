@@ -313,8 +313,40 @@ const passAllEntries = (jsonData) => {
 };
 
 const sortDates = (jsonData) => {
-  jsonData.sort((a, b) => new Date(a.updated) - new Date(b.updated));
   jsonData.reverse();
+  mergedArray = [];
+  mergedArray.push(jsonData[0]);
+  mergedArrayLen = mergedArray.length;
+
+  // sort() does not account for gerrit-review and gerrit delta difference
+  // manually sort through the JSON data and update it
+  for (let i = 1; i < jsonData.length; i++) {
+    if (Number(jsonData[i].merged.replaceAll("-","")) >
+        Number(mergedArray[mergedArrayLen-1].merged.replaceAll("-",""))){
+      mergedArray.push(jsonData[i]);
+      mergedArrayLen = mergedArray.length;
+    }
+    else {
+      for (let j = 1; j <= mergedArrayLen; j++) {
+        if (mergedArrayLen-j == 0){
+          mergedArray.splice(0, 0, jsonData[i]);
+        }
+        else{
+          if (Number(jsonData[i].merged.replaceAll("-","")) <=
+              Number(mergedArray[mergedArrayLen-j].merged.replaceAll("-",""))) {
+            continue;
+          }
+          else {
+            mergedArray.splice(mergedArrayLen-j + 1, 0, jsonData[i]);
+            mergedArrayLen = mergedArray.length;
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  jsonData = JSON.parse(JSON.stringify(mergedArray));
   addTotalTestAndTotalDesign(jsonData);
 };
 //Each option (jsonArr) goes through data manipulation starting here
@@ -360,7 +392,7 @@ const fillCumulativeCode = (input, totalTest, totalDesign) => {
 
 // Calculate days from the first commit
 const calculateDaysFromFirstCommit = (input) => {
-  input = input.slice().reverse();
+  input = input.slice();
   const originalDate = new Date(input[0]["updated"]);
   [input[0]["days from 1st commit"], input[0]["x"]] = [0, 0];
 
@@ -417,6 +449,7 @@ const getFirstAndLastCommit = (input) => {
     Math.round(
       (4 / input[input.length - 1]["Average days between each commit"]) * 100,
     ) / 100;
+  finalData = []; // reset, bad data/duplicate data was stored in here
   finalData.push(input);
   convertJsonToXlsx(input);
 };
