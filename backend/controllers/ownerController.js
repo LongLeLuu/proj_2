@@ -329,7 +329,13 @@ const sortDates = (jsonData) => {
     else {
       for (let j = 1; j <= mergedArrayLen; j++) {
         if (mergedArrayLen-j == 0){
-          mergedArray.splice(0, 0, jsonData[i]);
+          if (Number(jsonData[i].merged.replaceAll("-","")) <=
+              Number(mergedArray[0].merged.replaceAll("-",""))){
+            mergedArray.splice(0, 0, jsonData[i]);
+          }
+          else {
+            mergedArray.splice(1, 0, jsonData[i]);
+          }
         }
         else{
           if (Number(jsonData[i].merged.replaceAll("-","")) <=
