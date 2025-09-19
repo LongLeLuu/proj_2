@@ -376,7 +376,6 @@ const fillCumulativeCode = (input, totalTest, totalDesign) => {
 
   input
     .slice()
-    .reverse()
     .forEach((commit) => {
       currentTest += commit.testCodeChurn || 0;
       currentDesign += commit.sourceCodeChurn || 0;
